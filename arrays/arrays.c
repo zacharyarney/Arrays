@@ -78,8 +78,16 @@ void resize_array(Array *arr) {
 char *arr_read(Array *arr, int index) {
 
     // Throw an error if the index is greater or equal to than the current count
+    if (index >= arr->count) {
+        printf("Index exceeds the size of the array.");
+        return NULL;
+    }
 
     // Otherwise, return the element at the given index
+    else {
+        printf("%p\n", arr->elements[index]);
+        return arr->elements[index];
+    }
 }
 
 
@@ -165,8 +173,11 @@ int main(void)
     arr_print(arr);
     arr_remove(arr, "STRING3");
     arr_print(arr);
+    arr_read(arr, 2);
+    arr_read(arr, 12);
 
     destroy_array(arr);
+    arr_print(arr);
 
     return 0;
 }
