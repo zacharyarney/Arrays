@@ -6,6 +6,9 @@
 typedef struct Array {
     int capacity;  // How many elements can this array hold?
     int count;  // How many states does the array currently hold?
+    // char **elements is an array of pointers, each pointing to an array of
+    // chars (string)
+    // the fact that it's char * implies that there is an array
     char **elements;  // The string elements contained in the array
 } Array;
 
@@ -26,7 +29,7 @@ Array *create_array (int capacity) {
     arr->capacity = capacity;
     arr->count = 0;
     // Allocate memory for elements
-    arr->elements = malloc(sizeof(char) * capacity);
+    arr->elements = malloc(sizeof(char *) * capacity);
     return arr;
 }
 
@@ -34,12 +37,20 @@ Array *create_array (int capacity) {
 /*****
  * Free memory for an array and all of its stored elements
  *****/
+// pass in pointer to array (Array *arr) because passing in the array would
+// create a copy and we wouldn't be clearing the space of the original array
 void destroy_array(Array *arr) {
 
     // Free all elements
-    for (int i = 0; i < arr->capacity; i++) {
+    // frees each element inside elements
+    // make constraint count because we only need to free the spaces that have
+    // individual elements
+    for (int i = 0; i < arr->count; i++) {
         free(arr->elements[i]);
     }
+    // frees the array of pointers (elements) that point to the individual
+    // elements
+    free(arr->elements);
 
     // Free array
     free(arr);
@@ -115,12 +126,14 @@ void arr_append(Array *arr, char *element) {
 
     // Resize the array if the number of elements is over capacity
     // or throw an error if resize isn't implemented yet.
-    if (arr->count == arr->capacity) {
-        printf("Not enough memory allocated to append to this array");
+    if (arr->count >= arr->capacity) {
+        printf("Not enough memory allocated to append to this array\n");
+        return;
     }
 
     // Copy the element and add it to the end of the array
-    arr->elements[arr->count] = strdup(element);
+    char *new_element = strdup(element);
+    arr->elements[arr->count] = new_element; // strdup uses malloc under the hood
 
     // Increment count by 1
     arr->count++;
